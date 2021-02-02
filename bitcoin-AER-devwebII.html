@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="stylesheet.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin Today</title>
+</head>
+
+<body>
+    <h1 class="mt"> Loading ...</h1>
+</body>
+<script>
+    const getBRLBitcoinQuotation = async () => {
+        try {
+            let response = await fetch('https://api.coindesk.com/v1/bpi/currentprice/BRL.json')
+            return await response.json()
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    const getBitCoinQuotation = async () => {
+        try {
+            let response = await fetch('https://api.coindesk.com/v1/bpi/currentprice.json')
+            return await response.json()
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const populateTableRow = (table, row) => {
+        var tableRow = document.createElement('tr')
+        tableRow.innerHTML = `<td> ${row.code} </td>
+        <td> ${row.description} </td>
+        <td> ${row.rate} ${row.symbol} </td>
+        `
+        table.appendChild(tableRow)
+    }
+    const createDocumentBody = () => {
+        document.getElementsByTagName('body')[0].innerHTML = `
+                    <table id="BitcoinTable">
+                        <th> Coin Code </th>
+                        <th> Coin Description </th>
+                        <th> Bitcoin Value </th>
+                    </table>
+                    `
+    }
+    const fechTableDataAndPopulateDOM = () => {
+        document.addEventListener("DOMContentLoaded", (event) => {
+            getBitCoinQuotation().then(response => {
+                const mappedData = Object.entries(response.bpi).map(row => { return row[1] })
+                getBRLBitcoinQuotation().then(response => {
+                    const BRL = response.bpi.BRL
+                    BRL.symbol = 'R$'
+                    mappedData.push(BRL)
+                    createDocumentBody()
+                    var table = document.getElementById('BitcoinTable')
+                    mappedData.forEach(element => {
+                        populateTableRow(table, element)
+                    })
+
+                })
+            })
+        })
+    }
+    fechTableDataAndPopulateDOM()
+</script>
+</html>
